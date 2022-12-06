@@ -1,6 +1,5 @@
 const userRouter = require('./router/userRouter');
 const groupRouter = require('./router/groupRouter');
-
 const port = 3000;
 
 const express = require('express');
@@ -20,6 +19,12 @@ app.use(express.json())
 
 app.use(userRouter);
 app.use(groupRouter);
+
+app.get('*', (req, res) => {
+  return res.status(404).json({ 
+    message: 'Page not found' 
+  })
+})
 
 app.listen(port, () => {
   console.log(`Serveur à l'écoute sur le port ${port}`);

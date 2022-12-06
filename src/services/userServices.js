@@ -1,6 +1,9 @@
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken')
 const db = require("../models");
 const User = db.user;
+
+require('dotenv').config()
 
 
 /* 
@@ -33,9 +36,9 @@ async function getOneUser(req, res){
   User.findByPk(id, {
     attributes: ['email', 'firstname', 'lastname', 'groupe_id']
   })
-  .then(data => {
-    if (data) {
-      res.send(data);
+  .then(user => {
+    if (user) {
+      res.send(user);
     } else {
       res.status(404).send({
         message: `Cannot find User with id n°${id}.`
@@ -67,9 +70,9 @@ async function createUser(req, res){
   };
 
   User.create(user)
-  .then(data => {
+  .then(user => {
     res.send({
-      message: `User ${data.firstname} was created successfully.`
+      message: `User ${user.firstname} was created successfully.`
     });
   })
   .catch(err => {
@@ -80,6 +83,42 @@ async function createUser(req, res){
   });
 }
 
+/* 
+  PUBLIC : 
+  LOGIN 
+*/
+async function getJwt(req, res){
+  const thisUser = await User.findOne({ where: { 
+    email: req.body.email
+  }})
+
+  try {
+    if(thisUser) {
+      await bcrypt.compare(req.body.password, thisUser.password)
+      .then(result => {
+        if(result == true) {
+          const token = jwt.sign(
+            {
+              id: thisUser.id, 
+              email: thisUser.email
+            }, 
+            process.env.SECRET, {expiresIn: '3 hours'}
+          )
+          return res.json({ access_token: token })
+        } else {
+          res.status(404).send({
+            message: 'Error. Wrong login or password'
+          });
+        }
+      });
+    }
+  }
+  catch(err) {
+    res.status(500).send({
+      message: 'Error. Please retry in few minutes'
+    });
+  }
+}
 
 /* 
   PRIVATE (USER) : 
@@ -172,6 +211,7 @@ module.exports = {
   getAllUsers,
   getOneUser,
   createUser,
+  getJwt,
   joinGroupForUser,
   updateUser,
   deleteUser

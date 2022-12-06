@@ -18,6 +18,11 @@ router.post('/register', async function(req, res) {
   userService.createUser(req, res);
 });
 
+/* PUBLIC : LOGIN */
+router.post('/login', async function(req, res) {
+  userService.getJwt(req, res);
+})
+
 /* PRIVATE (USER) : JOIN A GROUP */
 router.put('/users/:id/groupe', function(req, res) {
   userService.joinGroupForUser(req, res);
