@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const { generateToken } = require('../middlewares/AuthenticateJWT');
 const db = require("../models");
 const User = db.user;
 
@@ -19,8 +20,7 @@ async function getAllUsers(req, res) {
   })
   .catch(err => {
     res.status(500).send({
-      message:
-        err.message || "Some error occurred while retrieving users."
+      message: err.message || "Some error occurred while retrieving users."
     });
   });
 };
@@ -77,8 +77,7 @@ async function createUser(req, res){
   })
   .catch(err => {
     res.status(500).send({
-      message:
-        err.message || "Some error occurred while creating the User."
+      message: err.message || "Some error occurred while creating the User."
     });
   });
 }
@@ -97,14 +96,8 @@ async function getJwt(req, res){
       await bcrypt.compare(req.body.password, thisUser.password)
       .then(result => {
         if(result == true) {
-          const token = jwt.sign(
-            {
-              id: thisUser.id, 
-              email: thisUser.email
-            }, 
-            process.env.SECRET, {expiresIn: '3 hours'}
-          )
-          return res.json({ access_token: token })
+          const token = generateToken(thisUser);
+          res.json({ access_token: token })
         } else {
           res.status(404).send({
             message: 'Error. Wrong login or password'

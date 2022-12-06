@@ -1,40 +1,42 @@
 const express = require('express');
+const { authMiddleware } = require('../middlewares/MiddlewareConnexion');
 const router = express.Router();
 const userService = require('../services/userServices');
 
 
 /* PUBLIC : USERS LIST */
-router.get('/users', async function(req, res) {
+router.get('/users', async (req, res) => {
   userService.getAllUsers(req, res);
 });
 
-/* PRIVATE (USER/ADMIN) : USER INFORMATION */
-router.get('/users/:id', async function(req, res) {
-  userService.getOneUser(req, res);
-});
-
 /* PUBLIC : REGISTER */
-router.post('/register', async function(req, res) {
+router.post('/register', async (req, res) => {
   userService.createUser(req, res);
 });
 
 /* PUBLIC : LOGIN */
-router.post('/login', async function(req, res) {
+router.post('/login', async (req, res) => {
   userService.getJwt(req, res);
 })
 
+
+/* PRIVATE (USER/ADMIN) : USER INFORMATION */
+router.get('/users/:id', async (req, res) => {
+  userService.getOneUser(req, res);
+});
+
 /* PRIVATE (USER) : JOIN A GROUP */
-router.put('/users/:id/groupe', function(req, res) {
+router.put('/users/:id/groupe', async (req, res) => {
   userService.joinGroupForUser(req, res);
 });
 
 /* PRIVATE (USER/ADMIN) : UPDATE AN USER */
-router.put('/users/:id', async function(req, res) {
+router.put('/users/:id', async (req, res) => {
   userService.updateUser(req, res);
 });
 
 /* PRIVATE (ADMIN) : DELETE AN USER */
-router.delete('/users/:id', async function(req, res) {
+router.delete('/users/:id', async (req, res) => {
   userService.deleteUser(req, res);
 });
 
