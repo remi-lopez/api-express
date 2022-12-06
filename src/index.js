@@ -1,10 +1,19 @@
-const userRouter = require('./routes/userRouter');
-const groupRouter = require('./routes/groupRouter');
+const userRouter = require('./router/userRouter');
+const groupRouter = require('./router/groupRouter');
 
-const port = 8080;
+const port = 3000;
 
 const express = require('express');
 const app = express();
+
+const db = require("./models");
+db.sequelize.sync()
+  .then(() => {
+    console.log("Synced db.");
+  })
+  .catch((err) => {
+    console.log("Failed to sync db: " + err.message);
+  });
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json())

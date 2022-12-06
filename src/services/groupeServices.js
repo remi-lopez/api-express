@@ -1,98 +1,140 @@
-const db = require('../services/db');
-const helper = require('../services/helper');
+const db = require("../models");
+const Group = db.group;
 
 
 /* 
-  PUBLIC : GROUPES LIST 
+  PUBLIC : 
+  GROUPES LIST 
 */
-async function getAllGroups(){
-  const rows = await db.query(
-    `SELECT name FROM groupe`
-  );
-  const groups = helper.emptyOrRows(rows);
-
-  return { groups }
+async function getAllGroups(req, res){
+  return Group.findAll({
+    attributes: ['name']
+  })
+  .then(groups => {
+    res.json(groups);
+  })
+  .catch(err => {
+    res.status(500).send({
+      message:
+        err.message || "Some error occurred while retrieving groups."
+    });
+  });
 }
 
-/* 
-  PUBLIC : GROUPES LIST WITH USERS
-*/
-async function getAllUsersInGroups(){
-  const rows = await db.query(
-    `SELECT groupe.name, user.firstname, user.lastname
-    FROM groupe
-    INNER JOIN user ON groupe.id=user.groupe_id`
-  );
-  const groups = helper.emptyOrRows(rows);
 
-  return { groups }
+/* 
+  PUBLIC : 
+  GROUPES LIST WITH USERS
+*/
+async function getAllUsersInGroups(req, res){
+  await Group.findAll({
+    attributes: ['name'],
+    include: [
+      { 
+        model: db.user, 
+        attributes: ['firstname', 'lastname']
+      }
+    ]
+  })
+  .then(groups => {
+    res.json(groups);
+  })
+  .catch(err => {
+    res.status(500).send({
+      message:
+        err.message || "Some error occurred while retrieving groups."
+    });
+  });
 }
 
+
 /* 
-  PRIVATE (ADMIN) : CREATE A GROUP 
+  PRIVATE (ADMIN) : 
+  CREATE A GROUP 
 */
-async function createGroup(value){
-  const result = await db.query(
-    `INSERT INTO groupe (name) VALUES ("${value.name}")`
-  );
+async function createGroup(req, res){
+  const groupe = {
+    name: req.body.name,
+  };
 
-  let message = 'Error in creating group';
-
-  if (result.affectedRows) {
-    message = `Group ${value.name} created successfully`;
-  }
-
-  return {message};
+  Group.create(groupe)
+  .then(data => {
+    res.send({
+      message: `Groupe ${data.name} was created successfully.`
+    });
+  })
+  .catch(err => {
+    res.status(500).send({
+      message:
+        err.message || "Some error occurred while creating the Group."
+    });
+  });
 }
 
+
 /* 
-  PRIVATE (ADMIN) : UPDATE A GROUP
+  PRIVATE (ADMIN) : 
+  UPDATE A GROUP
 */
-async function updateGroup(id, value){
-  let message = 'This group may not exists..';
+async function updateGroup(req, res){
+  const id = req.params.id;
 
-  const groupExist = await db.query(
-    `SELECT id, name FROM groupe WHERE id=${id}`
-  );
-
-  if(groupExist) {
-    const result = await db.query(
-      `UPDATE groupe SET name="${value.name}" WHERE id=${id}`
-    );
-  
-    if (result.affectedRows) {
-      message = `Group ${value.name} updated successfully`;
+  Group.update(req.body, {
+    where: { id: id }
+  })
+  .then(num => {
+    if (num == 1) {
+      res.send({
+        message: "Group was updated successfully."
+      });
+    } else {
+      res.send({
+        message: `Cannot update Group with id n°${id}. Maybe User was not found or req.body is empty!`
+      });
     }
-  }
-
-  return { message };
+  })
+  .catch(err => {
+    res.status(500).send({
+      message: "Error updating Group with id n°" + id
+    });
+  });
 }
 
+
 /* 
-  PRIVATE (ADMIN) : DELETE A GROUP
+  PRIVATE (ADMIN) : 
+  DELETE A GROUP
 */
-async function deleteGroup(id){
-  let message = 'This group may not exists..';
+async function deleteGroup(req, res){
+  const id = req.params.id;
 
-  const groupExist = await db.query(
-    `SELECT id, name FROM groupe WHERE id=${id}`
-  );
+  const user = {
+    groupe_id: null,
+  };
 
-  if(groupExist) {
-    const userResult = await db.query(
-      `UPDATE user SET groupe_id="NULL" WHERE groupe_id=${id}` 
-    );
-  
-    const result = await db.query(
-      `DELETE FROM groupe WHERE id=${id}` 
-    );
-  
-    if (result.affectedRows) {
-      message = `Group deleted successfully`;
+  await db.user.update(user, {
+    where: { groupe_id: id }
+  });
+
+  Group.destroy({
+    where: { id: id }
+  })
+  .then(num => {
+    if (num == 1) {
+      res.send({
+        message: "Group was deleted successfully!"
+      });
+    } else {
+      res.send({
+        message: `Cannot delete Group with id n°${id}. Maybe User was not found!`
+      });
     }
-  }
-
-  return { message };
+  })
+  .catch(err => {
+    res.status(500).send({
+      message: "Could not delete Group with id n°" + id
+    });
+  });
 }
 
 

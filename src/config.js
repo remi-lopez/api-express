@@ -1,12 +1,13 @@
-const config = {
-  db: {
-    host: "localhost",
-    user: "root",
-    password: "root",
-    database: "api_express",
-    port: 8889,
-  },
-  listPerPage: 10,
+module.exports = {
+  HOST: "localhost",
+  USER: "root",
+  PASSWORD: "root",
+  DB: "api_express",
+  dialect: "mysql",
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000
+  }
 };
-
-module.exports = config;
