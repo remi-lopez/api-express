@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+const jwt = require('jsonwebtoken');
 require('dotenv').config()
 
 const generateToken = (user) => {
@@ -16,11 +16,12 @@ const generateToken = (user) => {
 }
 
 const verifyToken = (token) => {
-  try {
-    return jwt.verify(token, process.env.SECRET);
-  } catch (error) {
-    throw new ErrorException(ErrorCode.Unauthenticated);
-  }
+  return jwt.verify(token, process.env.SECRET);
+  // try {
+  //   return jwt.verify(token, process.env.SECRET);
+  // } catch (error) {
+  //   throw new ErrorException(ErrorCode.Unauthenticated);
+  // }
 };
 
 module.exports = {

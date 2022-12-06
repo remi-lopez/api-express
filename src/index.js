@@ -5,14 +5,14 @@ const port = 3000;
 const express = require('express');
 const app = express();
 
-const db = require("./models");
+const db = require('./models');
 
 db.sequelize.sync()
 .then(() => {
-  console.log("Synced db.");
+  console.log('Synced db.');
 })
 .catch((err) => {
-  console.log("Failed to sync db: " + err.message);
+  console.log('Error : ' + err.message);
 });
 
 app.use(express.urlencoded({ extended: false }));

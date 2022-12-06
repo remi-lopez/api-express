@@ -21,22 +21,22 @@ router.post('/login', async (req, res) => {
 
 
 /* PRIVATE (USER/ADMIN) : USER INFORMATION */
-router.get('/users/:id', async (req, res) => {
+router.get('/users/:id', authMiddleware, async (req, res) => {
   userService.getOneUser(req, res);
 });
 
 /* PRIVATE (USER) : JOIN A GROUP */
-router.put('/users/:id/groupe', async (req, res) => {
+router.put('/users/:id/groupe', authMiddleware, async (req, res) => {
   userService.joinGroupForUser(req, res);
 });
 
 /* PRIVATE (USER/ADMIN) : UPDATE AN USER */
-router.put('/users/:id', async (req, res) => {
+router.put('/users/:id', authMiddleware, async (req, res) => {
   userService.updateUser(req, res);
 });
 
 /* PRIVATE (ADMIN) : DELETE AN USER */
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/:id', authMiddleware, async (req, res) => {
   userService.deleteUser(req, res);
 });
 

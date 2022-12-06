@@ -1,4 +1,5 @@
 const express = require('express');
+const { authMiddleware } = require('../middlewares/MiddlewareConnexion');
 const router = express.Router();
 const groups = require('../services/groupeServices');
 
@@ -15,17 +16,17 @@ router.get('/groups/users', async (req, res) => {
 
 
 /* PRIVATE (ADMIN) : CREATE A GROUP */
-router.post('/groups', async (req, res) => {
+router.post('/groups', authMiddleware, async (req, res) => {
   groups.createGroup(req, res)
 });
 
 /* PRIVATE (ADMIN) : UPDATE A GROUP */
-router.put('/groups/:id', async (req, res) => {
+router.put('/groups/:id', authMiddleware, async (req, res) => {
   groups.updateGroup(req, res)
 });
 
 /* PRIVATE (ADMIN) : DELETE A GROUP */
-router.delete('/groups/:id', async (req, res) => {
+router.delete('/groups/:id', authMiddleware, async (req, res) => {
   groups.deleteGroup(req, res)
 });
 
