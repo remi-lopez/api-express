@@ -6,7 +6,7 @@ const userService = require('../services/userServices');
 
 /* PUBLIC : USERS LIST */
 router.get('/users', async (req, res) => {
-  userService.getAllUsers(req, res);ù
+  userService.getAllUsers(req, res);
 });
 
 /* PUBLIC : REGISTER */

@@ -13,7 +13,7 @@ require('dotenv').config()
 */
 async function getAllUsers(req, res) {
   return User.findAll({
-    attributes: ['firstname', 'lastname', 'roles']
+    attributes: ['firstname', 'lastname']
   })
   .then(users => {
     res.json(users);
