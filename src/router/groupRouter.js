@@ -1,7 +1,7 @@
 const express = require('express');
-const { authMiddleware } = require('../middlewares/MiddlewareConnexion');
+const { authMiddleware } = require('../middlewares/authMiddleware');
 const router = express.Router();
-const groups = require('../services/groupeServices');
+const groups = require('../services/groupServices');
 
 
 /* PUBLIC : GROUPES LIST */

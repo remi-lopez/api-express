@@ -1,12 +1,12 @@
 const express = require('express');
-const { authMiddleware } = require('../middlewares/MiddlewareConnexion');
+const { authMiddleware } = require('../middlewares/authMiddleware');
 const router = express.Router();
 const userService = require('../services/userServices');
 
 
 /* PUBLIC : USERS LIST */
 router.get('/users', async (req, res) => {
-  userService.getAllUsers(req, res);
+  userService.getAllUsers(req, res);ù
 });
 
 /* PUBLIC : REGISTER */

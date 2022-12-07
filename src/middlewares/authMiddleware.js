@@ -1,5 +1,9 @@
-const { verifyToken } = require('./AuthenticateJWT');
+const { verifyToken } = require('../jwtToken/authJwtToken');
 
+/* 
+  SECURITY :
+  CHECK IF USER PROVIDE A VALID TOKEN
+*/
 const authMiddleware = (req, res, next) => {
   const auth = req.headers.authorization;
   
@@ -9,9 +13,10 @@ const authMiddleware = (req, res, next) => {
     try {
       const tokenData = verifyToken(token);
       req.body.tokenData = tokenData;
+
       next();
     } 
-    catch (error) {
+    catch(error) {
       res.status(401).send({
         message: 'You need to check your credentials'
       });
@@ -22,6 +27,7 @@ const authMiddleware = (req, res, next) => {
     });
   }
 };
+
 
 module.exports = {
   authMiddleware

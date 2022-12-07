@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const { generateToken } = require('../middlewares/AuthenticateJWT');
+const { generateToken } = require('../jwtToken/authJwtToken');
+const { rolesMiddleware } = require("../middlewares/rolesMiddleware");
 const db = require("../models");
 const User = db.user;
 
@@ -13,7 +13,7 @@ require('dotenv').config()
 */
 async function getAllUsers(req, res) {
   return User.findAll({
-    attributes: ['firstname', 'lastname']
+    attributes: ['firstname', 'lastname', 'roles']
   })
   .then(users => {
     res.json(users);
@@ -24,34 +24,6 @@ async function getAllUsers(req, res) {
     });
   });
 };
-
-
-/* 
-  PRIVATE (USER/ADMIN) : 
-  USER INFORMATION 
-*/
-async function getOneUser(req, res){
-  const id = req.params.id;
-
-  User.findByPk(id, {
-    attributes: ['email', 'firstname', 'lastname', 'groupe_id']
-  })
-  .then(user => {
-    if (user) {
-      res.send(user);
-    } else {
-      res.status(404).send({
-        message: `Cannot find User with id n°${id}.`
-      });
-    }
-  })
-  .catch(err => {
-    res.status(500).send({
-      message: "Error retrieving User with id n°" + id
-    });
-  });
-}
-
 
 /* 
   PUBLIC : 
@@ -113,6 +85,42 @@ async function getJwt(req, res){
   }
 }
 
+
+/* 
+  PRIVATE (USER/ADMIN) : 
+  USER INFORMATION 
+*/
+async function getOneUser(req, res){
+  const id = req.params.id;
+
+  const userToken = req.body.tokenData;
+  const userRole = await rolesMiddleware(userToken);
+
+  if((userRole === 'USER' && userToken.id == id) || (userRole === 'ADMIN')) {
+    User.findByPk(id, {
+      attributes: ['email', 'firstname', 'lastname', 'groupe_id']
+    })
+    .then(user => {
+      if (user) {
+        res.send(user);
+      } else {
+        res.status(404).send({
+          message: `Cannot find User with id n°${id}.`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error retrieving User with id n°" + id
+      });
+    });
+  } else {
+    res.status(500).send({
+      message: "You're not autorized to see user informations"
+    });
+  }
+}
+
 /* 
   PRIVATE (USER) : 
   JOIN A GROUP 
@@ -120,25 +128,34 @@ async function getJwt(req, res){
 async function joinGroupForUser(req, res){  
   const id = req.params.id;
 
-  User.update(req.body, {
-    where: { id: id }
-  })
-  .then(num => {
-    if (num == 1) {
-      res.send({
-        message: "User was updated successfully."
+  const userToken = req.body.tokenData;
+  const userRole = await rolesMiddleware(userToken);
+
+  if((userRole === 'USER' && userToken.id == id) || (userRole === 'ADMIN')) {
+    User.update(req.body, {
+      where: { id: id }
+    })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "User group was added successfully."
+        });
+      } else {
+        res.send({
+          message: `Cannot update User group with id n°${id}. Maybe User was not found or your input is empty!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating User group with id n°" + id
       });
-    } else {
-      res.send({
-        message: `Cannot update User with id n°${id}. Maybe User was not found or your input is empty!`
-      });
-    }
-  })
-  .catch(err => {
-    res.status(500).send({
-      message: "Error updating User with id n°" + id
     });
-  });
+  } else {
+    res.status(500).send({
+      message: "You're not autorized to make this action"
+    });
+  }
 }
 
 
@@ -149,25 +166,34 @@ async function joinGroupForUser(req, res){
 async function updateUser(req, res){
   const id = req.params.id;
 
-  User.update(req.body, {
-    where: { id: id }
-  })
-  .then(num => {
-    if (num == 1) {
-      res.send({
-        message: "User was updated successfully."
+  const userToken = req.body.tokenData;
+  const userRole = await rolesMiddleware(userToken);
+
+  if((userRole === 'USER' && userToken.id == id) || (userRole === 'ADMIN')) {
+    User.update(req.body, {
+      where: { id: id }
+    })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "User was updated successfully."
+        });
+      } else {
+        res.send({
+          message: `Cannot update User with id n°${id}. Maybe User was not found or req.body is empty!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error updating User with id n°" + id
       });
-    } else {
-      res.send({
-        message: `Cannot update User with id n°${id}. Maybe User was not found or req.body is empty!`
-      });
-    }
-  })
-  .catch(err => {
-    res.status(500).send({
-      message: "Error updating User with id n°" + id
     });
-  });
+  } else {
+    res.status(500).send({
+      message: "You're not autorized to update user informations"
+    });
+  }
 }
 
 
@@ -178,33 +204,41 @@ async function updateUser(req, res){
 async function deleteUser(req, res){
   const id = req.params.id;
 
-  User.destroy({
-    where: { id: id }
-  })
-  .then(num => {
-    if (num == 1) {
-      res.send({
-        message: "User was deleted successfully!"
+  const userRole = await rolesMiddleware(req.body.tokenData);
+
+  if(userRole === 'ADMIN') {
+    User.destroy({
+      where: { id: id }
+    })
+    .then(num => {
+      if (num == 1) {
+        res.send({
+          message: "User was deleted successfully!"
+        });
+      } else {
+        res.send({
+          message: `Cannot delete User with id n°${id}. Maybe User was not found!`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Could not delete User with id n°" + id
       });
-    } else {
-      res.send({
-        message: `Cannot delete User with id n°${id}. Maybe User was not found!`
-      });
-    }
-  })
-  .catch(err => {
-    res.status(500).send({
-      message: "Could not delete User with id n°" + id
     });
-  });
+  } else {
+    res.status(500).send({
+      message: "You're not autorized to delete user informations"
+    });
+  }
 }
 
 
 module.exports = {
   getAllUsers,
-  getOneUser,
   createUser,
   getJwt,
+  getOneUser,
   joinGroupForUser,
   updateUser,
   deleteUser
