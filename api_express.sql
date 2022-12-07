@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : localhost:8889
--- Généré le : mer. 07 déc. 2022 à 10:13
+-- Généré le : mer. 07 déc. 2022 à 13:35
 -- Version du serveur :  5.7.32
 -- Version de PHP : 8.0.3
 
@@ -51,7 +51,6 @@ INSERT INTO `groupe` (`id`, `name`, `created_at`, `updated_at`) VALUES
 (12, 'Django', '2022-12-07 08:07:38', '2022-12-07 08:07:38'),
 (14, 'NumPY', '2022-12-07 08:09:23', '2022-12-07 08:09:23'),
 (15, 'Oauth2', '2022-12-07 08:11:45', '2022-12-07 08:11:45'),
-(16, 'Bootstrap', '2022-12-07 08:13:17', '2022-12-07 08:13:17'),
 (17, 'CSS', '2022-12-07 08:13:36', '2022-12-07 08:13:36'),
 (18, 'Styled-Components', '2022-12-07 08:15:56', '2022-12-07 08:15:56'),
 (21, 'Flask', '2022-12-07 08:28:33', '2022-12-07 08:39:44');
@@ -80,8 +79,8 @@ CREATE TABLE `user` (
 
 INSERT INTO `user` (`id`, `email`, `roles`, `password`, `firstname`, `lastname`, `groupe_id`, `created_at`, `updated_at`) VALUES
 (6, 'jeandoe@gmail.com', 'USER', '$2b$12$TgTJnNftuZpEmEooZi6DzO..xAtop4s9GVIu6P5D1D/Ha1uzpNN6m', 'Jean', 'Doe', NULL, '2022-12-05 14:13:19', '2022-12-07 08:38:46'),
-(29, 'marceaudoe@gmail.com', 'USER', '$2b$12$3CvqYCT6yTHoTajBq7QmqusTWTooxRe3fX7o1mU/fvKHzUOr7E1f2', 'Marceau', 'Doe', 1, '2022-12-05 16:16:20', '2022-12-07 08:38:58'),
-(30, 'Hectordoe@gmail.com', 'USER', '$2b$12$CowyEa/2PdQhyyeTfC6EBeIWk7D.xyhYbQzZEeIUwHQDi.p93Fg6W', 'Hector', 'Doe', 1, '2022-12-05 16:21:06', '2022-12-07 08:39:00'),
+(29, 'marceaudoe@gmail.com', 'USER', '$2b$12$3CvqYCT6yTHoTajBq7QmqusTWTooxRe3fX7o1mU/fvKHzUOr7E1f2', 'Marceau', 'Doe', 12, '2022-12-05 16:16:20', '2022-12-07 13:35:16'),
+(30, 'Hectordoe@gmail.com', 'USER', '$2b$12$CowyEa/2PdQhyyeTfC6EBeIWk7D.xyhYbQzZEeIUwHQDi.p93Fg6W', 'Hector', 'Doe', 12, '2022-12-05 16:21:06', '2022-12-07 13:35:16'),
 (31, 'pierredoe@gmail.com', 'USER', '$2b$12$A.YE27jPAud/PUe6F9Zi4ec/vDGvuxvDiOkBLxeBNVCgrIqT/8lQm', 'Pierre', 'Doe', 5, '2022-12-05 16:22:11', '2022-12-07 09:59:07'),
 (32, 'mariusdoe@gmail.com', 'USER', '$2b$12$sv7hAZ8hGSJ2vDWTechk5OylF3LveXG97u0GVV01CEDrbvFQZPfZi', 'Marius', 'Doe', 12, '2022-12-06 09:25:16', '2022-12-07 09:49:49'),
 (34, 'quentindoe@gmail.com', 'USER', '$2b$12$Qb3kSM8gmZjnvMlSJ24H8.6pDY9Zaih1mjxk4MVJT/vwYWTLmJ/e2', 'Quentin', 'Doe', 4, '2022-12-06 09:45:37', '2022-12-07 09:15:05'),

@@ -25,6 +25,11 @@ router.put('/groups/:id', authMiddleware, async (req, res) => {
   groups.updateGroup(req, res)
 });
 
+/* PRIVATE (ADMIN) : UPDATE USERS IN A GROUP */
+router.put('/groups/:id/users', authMiddleware, async (req, res) => {
+  groups.updateUsersInGroups(req, res)
+});
+
 /* PRIVATE (ADMIN) : DELETE A GROUP */
 router.delete('/groups/:id', authMiddleware, async (req, res) => {
   groups.deleteGroup(req, res)

@@ -117,6 +117,47 @@ async function updateGroup(req, res){
   }
 }
 
+/* 
+  PUBLIC : 
+  GROUPES LIST WITH USERS
+*/
+async function updateUsersInGroups(req, res){
+  const id = req.params.id;
+  const usersArray = req.body.Users;
+  const newUsersArray = [];
+
+  const userRole = await rolesMiddleware(req.body.tokenData);
+
+  if(userRole === 'ADMIN') {
+    const groupExist = await Group.findByPk(id);
+
+    if(!groupExist) res.send({ message: "This group doesn't exists"});
+
+    for (const user of usersArray) {
+      let userToUpdate = await db.user.update(
+        { groupe_id: id },
+        { where: { id: user }}
+      )
+
+      newUsersArray.push(userToUpdate)
+    }
+
+    if(newUsersArray.length == usersArray.length) {
+      res.send({
+        message: "User group was added successfully."
+      });
+    } else {
+      res.send({
+        message: "Error updating group's users. This group may not exists"
+      });
+    }
+  } else {
+    res.status(500).send({
+      message: "You're not autorized to modify users in a group"
+    });
+  }
+}
+
 
 /* 
   PRIVATE (ADMIN) : 
@@ -168,5 +209,6 @@ module.exports = {
   getAllUsersInGroups,
   createGroup,
   updateGroup,
+  updateUsersInGroups,
   deleteGroup
 }
